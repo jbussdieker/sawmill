@@ -49,8 +49,8 @@ void usage(const char *prog) {
   }
 }
 
-void harvest(int index) {
-  printf("Hello %d\n", index);
+void harvest(char *file) {
+  printf("Hello %s\n", file);
   for (;;) {
   }
 }
@@ -110,7 +110,7 @@ int main(int argc, char **argv) {
   pthread_t *harvesters = calloc(argc, sizeof(pthread_t));
 
   for (i = 0; i < argc; i++) {
-    pthread_create(&harvesters[i], NULL, harvest, 123);
+    pthread_create(&harvesters[i], NULL, harvest, argv[i]);
   }
 
   for (i = 0; i < argc; i++) {
