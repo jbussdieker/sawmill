@@ -7,6 +7,8 @@
 
 #include "insist.h"
 
+#include "harvester.h"
+
 typedef enum {
   opt_help = 'h',
   opt_version = 'v',
@@ -49,12 +51,6 @@ void usage(const char *prog) {
   }
 }
 
-void harvest(char *file) {
-  printf("Hello %s\n", file);
-  for (;;) {
-  }
-}
-
 int main(int argc, char **argv) {
   int c, i;
   struct option *getopt_options = NULL;
@@ -71,6 +67,8 @@ int main(int argc, char **argv) {
   getopt_options[i].name = NULL;
 
   char *tmp;
+  char *host = 0;
+  int port = 0;
   while (i = -1, c = getopt_long_only(argc, argv, "+hv", getopt_options, &i), c != -1) {
     switch (c) {
       case opt_version:
@@ -80,10 +78,10 @@ int main(int argc, char **argv) {
         usage(argv[0]);
         return 0;
       case opt_host:
-        //emitter_config.host = strdup(optarg);
+        host = strdup(optarg);
         break;
       case opt_port:
-        //emitter_config.port = (short)atoi(optarg);
+        port = (short)atoi(optarg);
         break;
       default:
         insist(i == -1, "Flag (--%s%s%s) known, but someone forgot to " \
@@ -110,7 +108,11 @@ int main(int argc, char **argv) {
   pthread_t *harvesters = calloc(argc, sizeof(pthread_t));
 
   for (i = 0; i < argc; i++) {
-    pthread_create(&harvesters[i], NULL, (void * (*)(void *))harvest, argv[i]);
+    struct harvest_config *harvester = calloc(1, sizeof(struct harvest_config));
+    harvester->path = argv[i];
+    harvester->host = host;
+    harvester->port = port;
+    pthread_create(&harvesters[i], NULL, harvest, harvester);
   }
 
   for (i = 0; i < argc; i++) {
