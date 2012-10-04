@@ -2,6 +2,10 @@
 #include <stdio.h>
 #include <string.h>
 #include <getopt.h>
+#include <signal.h>
+#include <pthread.h>
+
+#include "insist.h"
 
 typedef enum {
   opt_help = 'h',
@@ -45,6 +49,12 @@ void usage(const char *prog) {
   }
 }
 
+void harvest(int index) {
+  printf("Hello %d\n", index);
+  for (;;) {
+  }
+}
+
 int main(int argc, char **argv) {
   int c, i;
   struct option *getopt_options = NULL;
@@ -75,8 +85,39 @@ int main(int argc, char **argv) {
       case opt_port:
         //emitter_config.port = (short)atoi(optarg);
         break;
+      default:
+        insist(i == -1, "Flag (--%s%s%s) known, but someone forgot to " \
+               "implement handling of it! This is certainly a bug.",
+               options[i].name, 
+               options[i].has_arg ? " " : "",
+               options[i].has_arg ? optarg : "");
+
+        usage(argv[0]);
+        return 1;
     }
   }
 
- return 0;
+  free(getopt_options);
+
+  argc -= optind;
+  argv += optind;
+
+  /* I'll handle write failures; no signals please */
+  signal(SIGPIPE, SIG_IGN);
+
+  insist(argc > 0, "No arguments given. What log files do you want shipped?");
+
+  pthread_t *harvesters = calloc(argc, sizeof(pthread_t));
+
+  for (i = 0; i < argc; i++) {
+    pthread_create(&harvesters[i], NULL, harvest, 123);
+  }
+
+  for (i = 0; i < argc; i++) {
+    pthread_join(harvesters[i], NULL);
+  }
+
+  printf("All harvesters completed. Exiting.\n");
+
+  return 1;
 }

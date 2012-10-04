@@ -4,4 +4,5 @@ AC_CONFIG_HEADERS([config.h])
 AM_INIT_AUTOMAKE
 AC_CONFIG_FILES([Makefile])
 AC_PROG_CC
+AC_CHECK_LIB(pthread, pthread_create)
 AC_OUTPUT
