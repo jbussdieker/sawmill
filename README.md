@@ -1,3 +1,7 @@
+# Sawmill
+
+[![Build Status](https://secure.travis-ci.org/jbussdieker/sawmill.png)](http://travis-ci.org/jbussdieker/sawmill)
+
 # Dependencies
 
 Sawmill uses RabbitMQ-C hosted here: https://github.com/alanxz/rabbitmq-c
