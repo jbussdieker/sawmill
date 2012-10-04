@@ -5,8 +5,4 @@ AM_INIT_AUTOMAKE
 AC_CONFIG_FILES([Makefile])
 AC_PROG_CC
 AC_CHECK_LIB(pthread, pthread_create)
-
-PKG_PROG_PKG_CONFIG
-PKG_CHECK_MODULES(rabbitmq, [librabbitmq])
-
 AC_OUTPUT
