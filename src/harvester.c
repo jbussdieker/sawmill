@@ -4,11 +4,39 @@
 #include <fcntl.h>
 
 #include "insist.h"
+#include "sleepdefs.h"
 
 #include "harvester.h"
+#include "backoff.h"
 #include "amqp.h"
 
 #define BUFFERSIZE 16384
+
+void track_rotation(int *fd, const char *path) {
+  struct stat pathstat, fdstat;
+  int rc;
+  fstat(*fd, &fdstat);
+  rc = stat(path, &pathstat);
+  if (rc == -1) {
+    /* error stat'ing the file path, restart loop and try again */
+    return;
+  }
+
+  if (pathstat.st_dev != fdstat.st_dev || pathstat.st_ino != fdstat.st_ino) {
+    /* device or inode number changed, this file was renamed or rotated. */
+    rc = open(path, O_RDONLY);
+    if (rc == -1) {
+      /* Error opening file, restart loop and try again. */
+      return;
+    }
+    close(*fd);
+    /* start reading the new file! */
+    *fd = rc; 
+  } else if (pathstat.st_size < fdstat.st_size) {
+    /* the file was truncated, jump back to the beginning */
+    lseek(*fd, 0, SEEK_SET);
+  }
+} /* track_rotation */
 
 void *harvest(void *arg) {
   struct harvest_config *config = arg;
@@ -24,25 +52,35 @@ void *harvest(void *arg) {
   }
   insist(fd >= 0, "open(%s) failed: %s", config->path, strerror(errno));
 
-  printf("Hello %s:%d %s\n", config->host, config->port, config->path);
   void *conn = amqp_open(config->host, config->port, "guest", "guest");
 
   char *buf;
   ssize_t bytes;
   buf = calloc(BUFFERSIZE, sizeof(char));
 
+  struct backoff sleeper;
+  backoff_init(&sleeper, &MIN_SLEEP, &MAX_SLEEP);
+
   int offset = 0;
   for (;;) {
     bytes = read(fd, buf + offset, BUFFERSIZE - offset - 1);
     offset += bytes;
-
     if (bytes < 0) {
-      //printf("BYTES < 0\n");
+      /* error, maybe indicate a failure of some kind. */
+      printf("read(%d '%s') failed: %s\n", fd,
+             config->path, strerror(errno));
+      break;
     } else if (bytes == 0) {
-      struct timespec sleep = { 0, 10000000 };
-      nanosleep(&sleep, NULL);
-      //printf("BYTES == 0\n");
+      backoff(&sleeper);
+      if (strcmp(config->path, "-") == 0) {
+        /* stdin gave EOF, close out. */
+        break;
+      }
+      track_rotation(&fd, config->path);
     } else {
+      /* Data read, handle it! */
+      backoff_clear(&sleeper);
+
       char *line;
       char *septok = buf;
       char *start = NULL;
