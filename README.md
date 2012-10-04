@@ -1,5 +1,7 @@
 # Compiling
 
- autoreconf -i
- ./configure
- make
+`````
+autoreconf -i
+./configure
+make
+`````
