@@ -110,7 +110,7 @@ int main(int argc, char **argv) {
   pthread_t *harvesters = calloc(argc, sizeof(pthread_t));
 
   for (i = 0; i < argc; i++) {
-    pthread_create(&harvesters[i], NULL, harvest, argv[i]);
+    pthread_create(&harvesters[i], NULL, (void * (*)(void *))harvest, argv[i]);
   }
 
   for (i = 0; i < argc; i++) {
