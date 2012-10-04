@@ -1,3 +1,7 @@
+# Dependencies
+
+Sawmill uses RabbitMQ-C hosted here: https://github.com/alanxz/rabbitmq-c
+
 # Compiling
 
 `````
