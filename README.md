@@ -1,18 +1,18 @@
 # Sawmill
 
+## Overview
+
 [![Build Status](https://secure.travis-ci.org/jbussdieker/sawmill.png)](http://travis-ci.org/jbussdieker/sawmill)
 
-## Dependencies
+Sawmill is a thin tool for tailing log files or STDIN and shipping messages off via AMQP for further processing.
 
-Sawmill uses RabbitMQ-C hosted here: https://github.com/alanxz/rabbitmq-c
-
-## Compiling
+## Install From Source
 
 `````
 ./get_deps
 autoreconf -i
 ./configure
-make
+make install
 `````
 
 ## Usage
