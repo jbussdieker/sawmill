@@ -5,6 +5,7 @@
 #include <signal.h>
 #include <pthread.h>
 
+#include "config.h"
 #include "insist.h"
 
 #include "harvester.h"
@@ -72,8 +73,8 @@ int main(int argc, char **argv) {
   while (i = -1, c = getopt_long_only(argc, argv, "+hv", getopt_options, &i), c != -1) {
     switch (c) {
       case opt_version:
-        printf("0.0.1\n");
-        break;
+        printf("%s\n", PACKAGE_STRING);
+        return 0;
       case opt_help:
         usage(argv[0]);
         return 0;

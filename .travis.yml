@@ -1,2 +1,2 @@
 language: c
-script: ./get_deps && autoreconf -i && ./configure && make
+script: ./build.sh
