@@ -18,7 +18,7 @@ make install
 ## Build Package
 
 `````
-fpm -s dir -t deb -n sawmill -v 0.0.1 --prefix /usr/local --description "a log shipping tool" bin/sawmill
+make deb
 `````
 
 ## Usage
