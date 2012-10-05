@@ -4,7 +4,7 @@
 
 [![Build Status](https://secure.travis-ci.org/jbussdieker/sawmill.png)](http://travis-ci.org/jbussdieker/sawmill)
 
-Sawmill is a thin tool for tailing log files or STDIN and shipping messages off via AMQP for further processing.
+Sawmill is a thin tool for tailing log files or STDIN and shipping messages off via AMQP for Logstash (http://logstash.net/) processing.
 
 ## Install From Source
 
