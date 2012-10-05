@@ -2,19 +2,20 @@
 
 [![Build Status](https://secure.travis-ci.org/jbussdieker/sawmill.png)](http://travis-ci.org/jbussdieker/sawmill)
 
-# Dependencies
+## Dependencies
 
 Sawmill uses RabbitMQ-C hosted here: https://github.com/alanxz/rabbitmq-c
 
-# Compiling
+## Compiling
 
 `````
+./get_deps
 autoreconf -i
 ./configure
 make
 `````
 
-# Usage
+## Usage
 
 Sawmill supports tailing files and stdin. The following two examples are equivalent.
 
