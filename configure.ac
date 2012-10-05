@@ -1,5 +1,5 @@
 AC_PREREQ([2.61])
-AC_INIT(sawmill, 0.0.2)
+AC_INIT(sawmill, 0.0.3)
 AC_CONFIG_HEADERS([config.h])
 AM_INIT_AUTOMAKE
 AC_CONFIG_FILES([Makefile])
