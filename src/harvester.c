@@ -93,7 +93,6 @@ void *harvest(void *arg) {
           /* emit line as an event */
           /* 'septok' points at the start of the next token, so subtract one. */
           size_t line_len = septok - start - 1;
-          printf("DEBUG: %s\n", line);
           emit(emitter, line);
         }
       }

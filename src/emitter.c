@@ -5,7 +5,12 @@
 #include "amqp.h"
 #include "harvester.h"
 
-char *replace(const char *s, const char *old, const char *new)
+struct emitter {
+  void *conn;
+  struct harvest_config *config;
+};
+
+static char *replace(const char *s, const char *old, const char *new)
 {
   char *ret;
   int i, count = 0;
@@ -41,20 +46,40 @@ char *replace(const char *s, const char *old, const char *new)
 
 void *new_emitter(void *arg) {
   struct harvest_config *config = arg;
-  void *conn = amqp_open(config->host, config->port, config->user, config->password);
-  return conn;
+  struct emitter *emitter = calloc(1, sizeof(struct emitter));
+
+  emitter->config = config;
+  emitter->conn = amqp_open(config->host, config->port, config->user, config->password);
+
+  return emitter;
 }
 
-void destroy_emitter(void *conn) {
-  amqp_close(conn);
+void destroy_emitter(void *arg) {
+  struct emitter *emitter = arg;
+  amqp_close(emitter->conn);
+  free(emitter);
 }
 
-void emit(void *conn, char *line) {
+void emit(void *arg, char *line) {
+  struct emitter *emitter = arg;
   char *message;
 
   line = replace(line, "\"", "\\\"");
-  message = malloc(strlen(line) + 50);
-  sprintf(message, "{\"message\":\"%s\"}", line);
+  message = malloc(strlen(line) + 256);
+  sprintf(message, "{\"@fields\":{\"message\":\"%s\"}", line);
 
-  amqp_publish(conn, "some_exchange", "logstash", message);
+  int i;
+  for (i = 0; i < emitter->config->fields_len; i++) {
+    char *key = emitter->config->fields[i].key;
+    char *value = emitter->config->fields[i].value;
+    char buf[128];
+    sprintf(buf, ",\"%s\":\"%s\"", key, value);
+    strcat(message, buf);
+  }
+  strcat(message, "}");
+
+  printf("%s\n", message);
+  amqp_publish(emitter->conn, "some_exchange", "logstash", message);
+
+  free(message);
 }

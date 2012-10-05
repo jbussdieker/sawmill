@@ -8,7 +8,8 @@ struct kv {
   size_t value_len;
 }; /* struct kv */
 
-void *new_emitter(void *arg);
-void emit(void *conn, char *line);
+void *new_emitter(void *emitter);
+void destroy_emitter(void *emitter);
+void emit(void *emitter, char *line);
 
 #endif /* _EMITTER_H_ */
