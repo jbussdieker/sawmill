@@ -78,7 +78,9 @@ void emit(void *arg, char *line) {
   }
   strcat(message, "}");
 
-  printf("%s\n", message);
+  #ifdef DEBUG
+    printf("%s\n", message);
+  #endif // DEBUG
   amqp_publish(emitter->conn, emitter->config->exchange, "logstash", message);
 
   free(message);
