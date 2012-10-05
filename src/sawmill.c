@@ -16,6 +16,8 @@ typedef enum {
   opt_field,
   opt_host,
   opt_port,
+  opt_user,
+  opt_password
 } optlist_t;
 
 struct option_doc {
@@ -33,9 +35,13 @@ static struct option_doc options[] = {
   { "field", required_argument, opt_field, 
     "Add a custom key-value mapping to every line emitted" },
   { "host", required_argument, opt_host,
-    "The hostname to send messages to" },
+    "The hostname of the AMQP server" },
   { "port", required_argument, opt_port,
-    "The port to send messages to" },
+    "The port of the AMQP server" },
+  { "user", required_argument, opt_user,
+    "The AMQP user to connect with (Default: guest)" },
+  { "password", required_argument, opt_password,
+    "The AMQP password to connect with (Default: guest)" },
   { NULL, 0, 0, NULL },
 };
 
@@ -56,6 +62,9 @@ int main(int argc, char **argv) {
   int c, i;
   struct option *getopt_options = NULL;
 
+  struct kv *extra_fields = NULL;
+  size_t extra_fields_len = 0;
+
   for (i = 0; options[i].name != NULL; i++) {
     getopt_options = realloc(getopt_options, (i+1) * sizeof(struct option));
     getopt_options[i].name = options[i].name;
@@ -69,6 +78,8 @@ int main(int argc, char **argv) {
 
   char *tmp;
   char *host = 0;
+  char *user = 0;
+  char *password = 0;
   int port = 0;
   while (i = -1, c = getopt_long_only(argc, argv, "+hv", getopt_options, &i), c != -1) {
     switch (c) {
@@ -81,8 +92,31 @@ int main(int argc, char **argv) {
       case opt_host:
         host = strdup(optarg);
         break;
+      case opt_user:
+        user = strdup(optarg);
+        break;
+      case opt_password:
+        password = strdup(optarg);
+        break;
       case opt_port:
         port = (short)atoi(optarg);
+        break;
+      case opt_field:
+        tmp = strchr(optarg, '=');
+        if (tmp == NULL) {
+          printf("Invalid --field setting, expected 'foo=bar' form, " \
+                 "didn't see '=' in '%s'", optarg);
+          usage(argv[0]);
+          exit(1);
+        }
+        extra_fields_len += 1;
+        extra_fields = realloc(extra_fields, extra_fields_len * sizeof(struct kv));
+        *tmp = '\0'; // turn '=' into null terminator
+        tmp++; /* skip to first char of value */
+        extra_fields[extra_fields_len - 1].key = strdup(optarg);
+        extra_fields[extra_fields_len - 1].key_len = strlen(optarg);
+        extra_fields[extra_fields_len - 1].value = strdup(tmp);
+        extra_fields[extra_fields_len - 1].value_len = strlen(tmp);
         break;
       default:
         insist(i == -1, "Flag (--%s%s%s) known, but someone forgot to " \
@@ -101,6 +135,26 @@ int main(int argc, char **argv) {
   argc -= optind;
   argv += optind;
 
+  if (host == NULL) {
+    printf("Missing --host flag\n");
+    usage(argv[0]);
+    return 1;
+  }
+
+  if (port == 0) {
+    printf("Missing --port flag\n");
+    usage(argv[0]);
+    return 1;
+  }
+
+  if (user == NULL) {
+    user = "guest";
+  }
+
+  if (password == NULL) {
+    password = "guest";
+  }
+
   /* I'll handle write failures; no signals please */
   signal(SIGPIPE, SIG_IGN);
 
@@ -113,6 +167,10 @@ int main(int argc, char **argv) {
     harvester->path = argv[i];
     harvester->host = host;
     harvester->port = port;
+    harvester->user = user;
+    harvester->password = password;
+    harvester->fields = extra_fields;
+    harvester->fields_len = extra_fields_len;
     pthread_create(&harvesters[i], NULL, harvest, harvester);
   }
 

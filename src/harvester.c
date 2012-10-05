@@ -52,7 +52,7 @@ void *harvest(void *arg) {
   }
   insist(fd >= 0, "open(%s) failed: %s", config->path, strerror(errno));
 
-  void *conn = amqp_open(config->host, config->port, "guest", "guest");
+  void *emitter = new_emitter(config);
 
   char *buf;
   ssize_t bytes;
@@ -93,14 +93,13 @@ void *harvest(void *arg) {
           /* emit line as an event */
           /* 'septok' points at the start of the next token, so subtract one. */
           size_t line_len = septok - start - 1;
-        
-          amqp_publish(conn, "stash_rawlogs", "logstash", line);
-          //printf("DEBUG: %*s\n", (int)line_len, line);
+          printf("DEBUG: %s\n", line);
+          emit(emitter, line);
         }
       }
     }
   }
 
-  amqp_close(conn);
+  destroy_emitter(emitter);
 }
 
