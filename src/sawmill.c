@@ -11,8 +11,8 @@
 #include "harvester.h"
 
 typedef enum {
-  opt_help,
-  opt_version,
+  opt_help='h',
+  opt_version='v',
   opt_exchange,
   opt_field,
   opt_user,
@@ -30,11 +30,11 @@ struct option_doc {
 
 static struct option_doc options[] = {
   { "help", no_argument, opt_help, 
-    "show this help" },
+    "Show this help" },
   { "version", no_argument, opt_version, 
-    "show the version of sawmill" },
+    "Show the version of sawmill" },
   { "field", required_argument, opt_field, 
-    "Add a custom key-value mapping to every line emitted" },
+    "Add a custom key-value mapping to every message" },
   { "exchange", required_argument, opt_exchange, 
     "The exchange to write messages to (Default: logstash)" },
   { "host", required_argument, opt_host,

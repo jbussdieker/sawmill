@@ -6,18 +6,21 @@
 
 Sawmill is a thin tool for tailing log files and/or stdin and shipping messages off via AMQP for Logstash (http://logstash.net/) processing.
 
-## Install From Source
+## Installing
+
+### From Source
 
 `````
 ./build.sh
-make install
+sudo make install
 `````
 
-## Build Package
+### From Package
 
 `````
 ./build.sh
 make deb
+sudo dpkg -i sawmill*.deb
 `````
 
 ## Usage
