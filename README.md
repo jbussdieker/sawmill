@@ -9,15 +9,14 @@ Sawmill is a thin tool for tailing log files or STDIN and shipping messages off 
 ## Install From Source
 
 `````
-./get_deps
-autoreconf -i
-./configure
+./build.sh
 make install
 `````
 
 ## Build Package
 
 `````
+./build.sh
 make deb
 `````
 
