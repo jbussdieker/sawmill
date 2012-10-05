@@ -22,17 +22,42 @@ make deb
 
 ## Usage
 
+### Logstash
+
+The following logstash config is useful for debugging.
+
+`````
+input {
+  amqp {
+    name => "some_queue"
+    host => "localhost"
+    port => 5673
+    user => "guest"
+    password => "guest"
+    exchange => "some_exchange"
+    type => "all"
+  }
+}
+output {
+  stdout {
+    debug => true
+  }
+}
+`````
+
+### Recipies
+
 Sawmill supports tailing files and stdin. The following two examples are equivalent.
 
 `````
-sawmill --host localhost --port 5673 /var/log/nginx/access.log /var/log/nginx/error.log
-tail -f /var/log/nginx/access.log | sawmill --host localhost --port 5673 - /var/log/nginx/error.log
+sawmill -e some_exchange -host localhost -port 5673 /var/log/nginx/access.log /var/log/nginx/error.log
+tail -f /var/log/nginx/access.log | sawmill -host localhost -port 5673 - /var/log/nginx/error.log
 `````
 
 You can also specify custom fields to add:
 
 `````
-sawmill --field @type=nginxlog --field @source=appserver01 --host localhost --port 5673 /var/log/nginx/access.log
+sawmill -e some_exchange -f @type=nginxlog -f @source=appserver01 -host localhost -port 5673 /var/log/nginx/access.log
 `````
 
 which would produce messages like this:

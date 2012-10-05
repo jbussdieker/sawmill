@@ -11,13 +11,14 @@
 #include "harvester.h"
 
 typedef enum {
-  opt_help = 'h',
-  opt_version = 'v',
+  opt_help,
+  opt_version,
+  opt_exchange,
   opt_field,
+  opt_user,
+  opt_password,
   opt_host,
   opt_port,
-  opt_user,
-  opt_password
 } optlist_t;
 
 struct option_doc {
@@ -34,6 +35,8 @@ static struct option_doc options[] = {
     "show the version of sawmill" },
   { "field", required_argument, opt_field, 
     "Add a custom key-value mapping to every line emitted" },
+  { "exchange", required_argument, opt_exchange, 
+    "The exchange to write messages to (Default: logstash)" },
   { "host", required_argument, opt_host,
     "The hostname of the AMQP server" },
   { "port", required_argument, opt_port,
@@ -80,6 +83,7 @@ int main(int argc, char **argv) {
   char *host = 0;
   char *user = 0;
   char *password = 0;
+  char *exchange = 0;
   int port = 0;
   while (i = -1, c = getopt_long_only(argc, argv, "+hv", getopt_options, &i), c != -1) {
     switch (c) {
@@ -91,6 +95,9 @@ int main(int argc, char **argv) {
         return 0;
       case opt_host:
         host = strdup(optarg);
+        break;
+      case opt_exchange:
+        exchange = strdup(optarg);
         break;
       case opt_user:
         user = strdup(optarg);
@@ -155,6 +162,10 @@ int main(int argc, char **argv) {
     password = "guest";
   }
 
+  if (exchange == NULL) {
+    exchange = "logstash";
+  }
+
   /* I'll handle write failures; no signals please */
   signal(SIGPIPE, SIG_IGN);
 
@@ -166,6 +177,7 @@ int main(int argc, char **argv) {
     struct harvest_config *harvester = calloc(1, sizeof(struct harvest_config));
     harvester->path = argv[i];
     harvester->host = host;
+    harvester->exchange = exchange;
     harvester->port = port;
     harvester->user = user;
     harvester->password = password;

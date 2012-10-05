@@ -79,7 +79,7 @@ void emit(void *arg, char *line) {
   strcat(message, "}");
 
   printf("%s\n", message);
-  amqp_publish(emitter->conn, "some_exchange", "logstash", message);
+  amqp_publish(emitter->conn, emitter->config->exchange, "logstash", message);
 
   free(message);
 }

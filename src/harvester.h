@@ -4,14 +4,15 @@
 #include "emitter.h"
 
 struct harvest_config {
-  char *path; /* the path to harvest */
+  char *path;
   char *host;
+  char *exchange;
   int port;
   char *user;
   char *password;
 
-  struct kv *fields; /* any extra fields to add to each event */
-  size_t fields_len; /* number of fields */
+  struct kv *fields;
+  size_t fields_len;
 };
 
 void *harvest(void *);
