@@ -4,6 +4,7 @@ cd vendor/rabbitmq-c
 git checkout 08fbbed79a3963320f9f3b850302afa095c0b348
 git submodule init
 git submodule update
+sed -i 's/disable-static //g' configure.ac
 autoreconf -i
 ./configure
 make
