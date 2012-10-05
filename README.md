@@ -38,5 +38,5 @@ sawmill --field @type=nginxlog --field @source=appserver01 --host localhost --po
 which would produce messages like this:
 
 `````
-{"@fields":{"message":"1.2.3.4 - - [12/Sept/1983:00:29:26 -0700] \"GET /awesome HTTP/0.1\" 301 173 \"-\" \"browser/0.3\""},"@type":"nginxlog","@source":"appserver01"}
+{"@fields":{"message":"[some line from the log]"},"@type":"nginxlog","@source":"appserver01"}
 `````
