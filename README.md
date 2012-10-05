@@ -45,7 +45,7 @@ output {
 }
 `````
 
-### Recipies
+### Recipes
 
 Sawmill supports tailing files and stdin. The following two examples are equivalent.
 
