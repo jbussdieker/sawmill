@@ -47,7 +47,7 @@ output {
 
 ### Recipes
 
-Sawmill supports tailing files and stdin. The following two examples are equivalent.
+Sawmill supports tailing files and stdin (identified by a single - ). The following two examples are equivalent.
 
 `````
 sawmill -e some_exchange -host localhost -port 5673 /var/log/nginx/access.log /var/log/nginx/error.log
