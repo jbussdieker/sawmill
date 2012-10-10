@@ -7,6 +7,7 @@ struct harvest_config {
   char *path;
   char *host;
   char *exchange;
+  int debug;
   int port;
   char *user;
   char *password;

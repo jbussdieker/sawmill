@@ -14,6 +14,7 @@ typedef enum {
   opt_help='h',
   opt_version='v',
   opt_exchange,
+  opt_debug,
   opt_field,
   opt_user,
   opt_password,
@@ -31,6 +32,8 @@ struct option_doc {
 static struct option_doc options[] = {
   { "help", no_argument, opt_help, 
     "Show this help" },
+  { "debug", no_argument, opt_debug, 
+    "Enable debug output" },
   { "version", no_argument, opt_version, 
     "Show the version of sawmill" },
   { "field", required_argument, opt_field, 
@@ -85,6 +88,7 @@ int main(int argc, char **argv) {
   char *password = 0;
   char *exchange = 0;
   int port = 0;
+  int debug = 0;
   while (i = -1, c = getopt_long_only(argc, argv, "+hv", getopt_options, &i), c != -1) {
     switch (c) {
       case opt_version:
@@ -93,6 +97,10 @@ int main(int argc, char **argv) {
       case opt_help:
         usage(argv[0]);
         return 0;
+      case opt_debug:
+        printf("DEBUG: Debug mode enabled\n");
+        debug = 1;
+        break;
       case opt_host:
         host = strdup(optarg);
         break;
@@ -143,13 +151,13 @@ int main(int argc, char **argv) {
   argv += optind;
 
   if (host == NULL) {
-    printf("Missing --host flag\n");
+    printf("\nERROR: Missing --host flag\n\n");
     usage(argv[0]);
     return 1;
   }
 
   if (port == 0) {
-    printf("Missing --port flag\n");
+    printf("\nERROR: Missing --port flag\n\n");
     usage(argv[0]);
     return 1;
   }
@@ -176,6 +184,7 @@ int main(int argc, char **argv) {
   for (i = 0; i < argc; i++) {
     struct harvest_config *harvester = calloc(1, sizeof(struct harvest_config));
     harvester->path = argv[i];
+    harvester->debug = debug;
     harvester->host = host;
     harvester->exchange = exchange;
     harvester->port = port;
@@ -184,6 +193,9 @@ int main(int argc, char **argv) {
     harvester->fields = extra_fields;
     harvester->fields_len = extra_fields_len;
     pthread_create(&harvesters[i], NULL, harvest, harvester);
+    if (debug == 1) {
+      printf("DEBUG: Starting harvester for: %s\n", argv[i]);
+    }
   }
 
   for (i = 0; i < argc; i++) {
