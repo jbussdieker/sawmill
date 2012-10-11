@@ -70,7 +70,7 @@ void emit(void *arg, int line_len, char *dirp) {
 
   //line[strlen(line)-1] = 0;
   message = malloc(line_len + 256);
-  sprintf(message, "{\"@fields\":{\"message\":\"%s\"}", line);
+  sprintf(message, "{\"@fields\":{},\"@message\":\"%s\"", line);
 
   int i;
   for (i = 0; i < emitter->config->fields_len; i++) {
