@@ -71,6 +71,7 @@ void emit(void *arg, int line_len, char *dirp) {
   dirp2[line_len] = 0;
 
   char *line = replace(dirp2, "\"", "\\\"");
+  printf("dirp2 free: %p\n", dirp2);
   free(dirp2);
 
   //line[strlen(line)-1] = 0;
