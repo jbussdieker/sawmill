@@ -5,9 +5,9 @@
 	done
 ) | ./bin/sawmill --host localhost --port -1 - &
 
-exit 0
+sleep 1
 
-for (( ; ; )); do
+for i in {1..30}; do
   # Get test proc pid
   PID=`ps -edf | grep sawmill | grep -v grep | awk '{print $2}'`
 
