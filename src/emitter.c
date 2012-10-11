@@ -25,7 +25,7 @@ static char *replace(const char *s, const char *old, const char *new)
   }
 
   ret = malloc(i + count * (newlen - oldlen));
-  printf("replace malloc: %p\n", ret);
+  printf("replace malloc: %d, %p\n", i + count * (newlen - oldlen), ret);
   if (ret == NULL)
     exit(EXIT_FAILURE);
 
@@ -66,7 +66,7 @@ void emit(void *arg, int line_len, char *dirp) {
   char *message;
 
   char *dirp2 = malloc(line_len + 1);
-  printf("dirp2 malloc: %p\n", dirp2);
+  printf("dirp2 malloc: %d, %p\n", line_len + 1);
   memcpy(dirp2, dirp, line_len);
   dirp2[line_len] = 0;
 
@@ -76,7 +76,7 @@ void emit(void *arg, int line_len, char *dirp) {
 
   //line[strlen(line)-1] = 0;
   message = malloc(line_len + 256);
-  printf("message malloc: %p\n", message);
+  printf("message malloc: %d, %p\n", line_len + 256, message);
   sprintf(message, "{\"@fields\":{},\"@message\":\"%s\"", line);
 
   int i;
