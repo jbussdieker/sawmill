@@ -64,7 +64,10 @@ void emit(void *arg, int line_len, char *dirp) {
   struct emitter *emitter = arg;
   char *message;
 
-  char *dirp2 = strdup(dirp);
+  char *dirp2 = malloc(line_len + 1);
+  memcpy(dirp2, dirp, line_len);
+  dirp2[line_len] = 0;
+
   char *line = replace(dirp2, "\"", "\\\"");
   free(dirp2);
 
