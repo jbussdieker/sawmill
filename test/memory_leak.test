@@ -19,12 +19,13 @@ for i in {1..15}; do
   # Print RSS and sleep
   RSS=`ps -y -l -p $PID | tail -n 1 | awk '{print $8}'`
   echo "Memory Usage: $RSS bytes"
+
+  if [[ "x$i" == "x30" ]]; then echo "Test timed out :("
+    echo 2
+  fi
+
   sleep 1
 done
 
-if [[ "x$i" == "x30" ]]; then
-  echo "Test timed out :("
-  echo 2
-fi
 
 exit 0

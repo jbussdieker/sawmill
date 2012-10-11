@@ -66,6 +66,7 @@ void emit(void *arg, int line_len, char *dirp) {
   char *message;
 
   char *dirp2 = malloc(line_len + 1);
+  printf("dirp2 malloc: %p\n", dirp2);
   memcpy(dirp2, dirp, line_len);
   dirp2[line_len] = 0;
 
@@ -74,6 +75,7 @@ void emit(void *arg, int line_len, char *dirp) {
 
   //line[strlen(line)-1] = 0;
   message = malloc(line_len + 256);
+  printf("message malloc: %p\n", message);
   sprintf(message, "{\"@fields\":{},\"@message\":\"%s\"", line);
 
   int i;
