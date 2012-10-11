@@ -25,9 +25,7 @@ static char *replace(const char *s, const char *old, const char *new)
     }
   }
 
-  ret = sawmill_malloc(i + count * (newlen - oldlen));
-  //printf("RET_A: "); hex_dump(ret, 16);
-  //printf("replace malloc: %d, %p\n", i + count * (newlen - oldlen), ret);
+  ret = sawmill_malloc(i + count * (newlen - oldlen) + 1);
   if (ret == NULL)
     exit(EXIT_FAILURE);
 
@@ -44,7 +42,6 @@ static char *replace(const char *s, const char *old, const char *new)
 
   ret[i] = '\0';
 
-  //printf("RET_B: "); hex_dump(ret, 16);
   return ret;
 }
 
@@ -69,19 +66,13 @@ void emit(void *arg, int line_len, char *dirp) {
   char *message;
 
   char *dirp2 = sawmill_malloc(line_len + 1);
-  //printf("dirp2 malloc: %d, %p\n", line_len + 1, dirp2);
   memcpy(dirp2, dirp, line_len);
   dirp2[line_len] = 0;
 
   char *line = replace(dirp2, "\"", "\\\"");
-  //printf("replace returned: %p\n", line);
-  //printf("dirp2 free: %p\n", dirp2);
   sawmill_free(dirp2);
-  //printf("dirp2 freed ok\n");
 
-  //line[strlen(line)-1] = 0;
   message = sawmill_malloc(line_len + 256);
-  //printf("message malloc: %d, %p\n", line_len + 256, message);
   sprintf(message, "{\"@fields\":{},\"@message\":\"%s\"", line);
 
   int i;
