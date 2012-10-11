@@ -7,7 +7,7 @@
 
 sleep 1
 
-for i in {1..30}; do
+for i in {1..15}; do
   # Get test proc pid
   PID=`ps -edf | grep sawmill | grep -v grep | awk '{print $2}'`
 
@@ -21,5 +21,10 @@ for i in {1..30}; do
   echo "Memory Usage: $RSS bytes"
   sleep 1
 done
+
+if [[ "x$i" == "x30" ]]; then
+  echo "Test timed out :("
+  echo 2
+fi
 
 exit 0
