@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "memory.h"
 #include "amqp.h"
 #include "harvester.h"
 
@@ -24,7 +25,9 @@ static char *replace(const char *s, const char *old, const char *new)
     }
   }
 
-  ret = malloc(i + count * (newlen - oldlen));
+  ret = sawmill_malloc(i + count * (newlen - oldlen));
+  //printf("RET_A: "); hex_dump(ret, 16);
+  //printf("replace malloc: %d, %p\n", i + count * (newlen - oldlen), ret);
   if (ret == NULL)
     exit(EXIT_FAILURE);
 
@@ -41,6 +44,7 @@ static char *replace(const char *s, const char *old, const char *new)
 
   ret[i] = '\0';
 
+  //printf("RET_B: "); hex_dump(ret, 16);
   return ret;
 }
 
@@ -60,13 +64,25 @@ void destroy_emitter(void *arg) {
   free(emitter);
 }
 
-void emit(void *arg, char *line) {
+void emit(void *arg, int line_len, char *dirp) {
   struct emitter *emitter = arg;
   char *message;
 
-  line = replace(line, "\"", "\\\"");
-  message = malloc(strlen(line) + 256);
-  sprintf(message, "{\"@fields\":{\"message\":\"%s\"}", line);
+  char *dirp2 = sawmill_malloc(line_len + 1);
+  //printf("dirp2 malloc: %d, %p\n", line_len + 1, dirp2);
+  memcpy(dirp2, dirp, line_len);
+  dirp2[line_len] = 0;
+
+  char *line = replace(dirp2, "\"", "\\\"");
+  //printf("replace returned: %p\n", line);
+  //printf("dirp2 free: %p\n", dirp2);
+  sawmill_free(dirp2);
+  //printf("dirp2 freed ok\n");
+
+  //line[strlen(line)-1] = 0;
+  message = sawmill_malloc(line_len + 256);
+  //printf("message malloc: %d, %p\n", line_len + 256, message);
+  sprintf(message, "{\"@fields\":{},\"@message\":\"%s\"", line);
 
   int i;
   for (i = 0; i < emitter->config->fields_len; i++) {
@@ -84,5 +100,6 @@ void emit(void *arg, char *line) {
 
   amqp_publish(emitter->conn, emitter->config->exchange, "logstash", message);
 
-  free(message);
+  sawmill_free(line);
+  sawmill_free(message);
 }

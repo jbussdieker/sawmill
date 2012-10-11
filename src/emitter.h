@@ -10,6 +10,6 @@ struct kv {
 
 void *new_emitter(void *emitter);
 void destroy_emitter(void *emitter);
-void emit(void *emitter, char *line);
+void emit(void *emitter, int line_len, char *line);
 
 #endif /* _EMITTER_H_ */

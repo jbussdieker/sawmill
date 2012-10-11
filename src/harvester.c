@@ -96,7 +96,7 @@ void *harvest(void *arg) {
           if (config->debug == 1) {
             printf("DEBUG: [HARVESTER] %*s\n", (int)line_len, line);
           }
-          emit(emitter, line);
+          emit(emitter, line_len, line);
         }
       }
     }
