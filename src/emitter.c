@@ -25,6 +25,7 @@ static char *replace(const char *s, const char *old, const char *new)
   }
 
   ret = malloc(i + count * (newlen - oldlen));
+  printf("replace malloc: %p\n", ret);
   if (ret == NULL)
     exit(EXIT_FAILURE);
 
