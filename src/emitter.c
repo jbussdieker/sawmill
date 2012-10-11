@@ -74,6 +74,7 @@ void emit(void *arg, int line_len, char *dirp) {
   printf("replace returned: %p\n", line);
   printf("dirp2 free: %p\n", dirp2);
   free(dirp2);
+  printf("dirp2 freed ok\n");
 
   //line[strlen(line)-1] = 0;
   message = malloc(line_len + 256);
