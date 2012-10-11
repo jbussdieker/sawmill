@@ -60,12 +60,16 @@ void destroy_emitter(void *arg) {
   free(emitter);
 }
 
-void emit(void *arg, char *line) {
+void emit(void *arg, int line_len, char *dirp) {
   struct emitter *emitter = arg;
   char *message;
 
-  line = replace(line, "\"", "\\\"");
-  message = malloc(strlen(line) + 256);
+  char *dirp2 = strdup(dirp);
+  char *line = replace(dirp2, "\"", "\\\"");
+  free(dirp2);
+
+  //line[strlen(line)-1] = 0;
+  message = malloc(line_len + 256);
   sprintf(message, "{\"@fields\":{\"message\":\"%s\"}", line);
 
   int i;
@@ -84,5 +88,6 @@ void emit(void *arg, char *line) {
 
   amqp_publish(emitter->conn, emitter->config->exchange, "logstash", message);
 
+  free(line);
   free(message);
 }
