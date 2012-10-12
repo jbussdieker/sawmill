@@ -102,6 +102,6 @@ void *harvest(void *arg) {
     }
   }
 
-  destroy_emitter(emitter);
+  close_emitter(emitter);
 }
 

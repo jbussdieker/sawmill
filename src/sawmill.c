@@ -39,15 +39,15 @@ static struct option_doc options[] = {
   { "field", required_argument, opt_field, 
     "Add a custom key-value mapping to every message" },
   { "exchange", required_argument, opt_exchange, 
-    "The exchange to write messages to (Default: logstash)" },
+    "The exchange to write messages to (*required for AMQP)" },
   { "host", required_argument, opt_host,
-    "The hostname of the AMQP server" },
+    "The hostname of the AMQP server   (localhost)" },
   { "port", required_argument, opt_port,
-    "The port of the AMQP server" },
+    "The port of the AMQP server       (5672)" },
   { "user", required_argument, opt_user,
-    "The AMQP user to connect with (Default: guest)" },
+    "The AMQP user to connect with     (guest)" },
   { "password", required_argument, opt_password,
-    "The AMQP password to connect with (Default: guest)" },
+    "The AMQP password to connect with (guest)" },
   { NULL, 0, 0, NULL },
 };
 
@@ -151,15 +151,11 @@ int main(int argc, char **argv) {
   argv += optind;
 
   if (host == NULL) {
-    printf("\nERROR: Missing --host flag\n\n");
-    usage(argv[0]);
-    return 1;
+    host = "localhost";
   }
 
   if (port == 0) {
-    printf("\nERROR: Missing --port flag\n\n");
-    usage(argv[0]);
-    return 1;
+    port = 5672;
   }
 
   if (user == NULL) {
@@ -170,14 +166,13 @@ int main(int argc, char **argv) {
     password = "guest";
   }
 
-  if (exchange == NULL) {
-    exchange = "logstash";
-  }
-
   /* I'll handle write failures; no signals please */
   signal(SIGPIPE, SIG_IGN);
 
-  insist(argc > 0, "No arguments given. What log files do you want shipped?");
+  if (argc == 0) {
+    argc = 1;
+    argv[0] = "-";
+  }
 
   pthread_t *harvesters = calloc(argc, sizeof(pthread_t));
 
@@ -194,7 +189,7 @@ int main(int argc, char **argv) {
     harvester->fields_len = extra_fields_len;
     pthread_create(&harvesters[i], NULL, harvest, harvester);
     if (debug == 1) {
-      printf("DEBUG: Starting harvester for: %s\n", argv[i]);
+      printf("DEBUG: Creating harvester (%s)\n", argv[i]);
     }
   }
 

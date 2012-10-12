@@ -7,57 +7,71 @@
 #include "harvester.h"
 
 struct emitter {
-  void *conn;
+  void *(*emit)(struct emitter *, char *);
+  void *(*close)(struct emitter *);
+
+  void *data;
   struct harvest_config *config;
 };
 
-static char *replace(const char *s, const char *old, const char *new)
-{
-  char *ret;
-  int i, count = 0;
-  size_t newlen = strlen(new);
-  size_t oldlen = strlen(old);
-
-  for (i = 0; s[i] != '\0'; i++) {
-    if (strstr(&s[i], old) == &s[i]) {
-      count++;
-      i += oldlen - 1;
-    }
-  }
-
-  ret = sawmill_malloc(i + count * (newlen - oldlen) + 1);
-  if (ret == NULL)
-    exit(EXIT_FAILURE);
-
-  i = 0;
-  while (*s) {
-    if (strstr(s, old) == s) {
-      strcpy(&ret[i], new);
-      i += newlen;
-      s += oldlen;
-    } else {
-      ret[i++] = *s++;
-    }
-  }
-
-  ret[i] = '\0';
-
-  return ret;
+///////////////////////////////////////////////////////////////////////////////
+// STDOUT
+///////////////////////////////////////////////////////////////////////////////
+void emit_stdout(struct emitter *emitter, char *message) {
+  printf("%s\n", message);
 }
 
-void *new_emitter(void *arg) {
-  struct harvest_config *config = arg;
+void close_stdout(struct emitter *emitter) {
+}
+
+struct emitter *new_stdout_emitter(struct harvest_config *config) {
   struct emitter *emitter = calloc(1, sizeof(struct emitter));
-
   emitter->config = config;
-  emitter->conn = amqp_open(config->host, config->port, config->user, config->password);
 
+  emitter->emit = &emit_stdout;
+  emitter->close = &close_stdout;
   return emitter;
 }
 
-void destroy_emitter(void *arg) {
+///////////////////////////////////////////////////////////////////////////////
+// AMQP
+///////////////////////////////////////////////////////////////////////////////
+void emit_amqp(struct emitter *emitter, char *message) {
+  amqp_publish(emitter->data, emitter->config->exchange, "logstash", message);
+}
+
+void close_amqp(struct emitter *emitter) {
+  amqp_close(emitter->data);
+}
+
+struct emitter *new_amqp_emitter(struct harvest_config *config) {
+  struct emitter *emitter = calloc(1, sizeof(struct emitter));
+  emitter->config = config;
+
+  emitter->data = amqp_open(config->host, config->port, config->user, config->password);
+  emitter->emit = &emit_amqp;
+  emitter->close = &close_amqp;
+  return emitter;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// BASE
+///////////////////////////////////////////////////////////////////////////////
+void *new_emitter(void *arg) {
+  struct harvest_config *config = arg;
+
+  if (config->exchange == NULL) {
+    if (config->debug == 1) printf("DEBUG: Creating emitter (STDOUT)\n");
+    return new_stdout_emitter(config);
+  } else {
+    if (config->debug == 1) printf("DEBUG: Creating emitter (AMQP)\n");
+    return new_amqp_emitter(config);
+  }
+}
+
+void close_emitter(void *arg) {
   struct emitter *emitter = arg;
-  amqp_close(emitter->conn);
+  emitter->close(emitter);
   free(emitter);
 }
 
@@ -89,8 +103,9 @@ void emit(void *arg, int line_len, char *dirp) {
     printf("DEBUG: [EMITTER] %s\n", message);
   }
 
-  amqp_publish(emitter->conn, emitter->config->exchange, "logstash", message);
+  emitter->emit(emitter, message);
 
   sawmill_free(line);
   sawmill_free(message);
 }
+
