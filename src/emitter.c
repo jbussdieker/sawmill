@@ -19,6 +19,7 @@ struct emitter {
 ///////////////////////////////////////////////////////////////////////////////
 void emit_stdout(struct emitter *emitter, char *message) {
   printf("%s\n", message);
+  fflush(stdout);
 }
 
 void close_stdout(struct emitter *emitter) {
