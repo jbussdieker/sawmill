@@ -38,7 +38,13 @@ input {
     user => "guest"
     password => "guest"
     exchange => "some_exchange"
-    type => "all"
+    type => "amqp_input"
+  }
+  udp {
+    format => "json"
+    host => "0.0.0.0"
+    port => 8675
+    type => "udp_input"
   }
 }
 output {
@@ -55,6 +61,12 @@ Sawmill supports tailing files and stdin (identified by a single - ). The follow
 `````
 sawmill -e some_exchange -host localhost -port 5673 /var/log/nginx/access.log /var/log/nginx/error.log
 tail -f /var/log/nginx/access.log | sawmill -host localhost -port 5673 - /var/log/nginx/error.log
+`````
+
+Sending via UDP/JSON is easly done with netcat
+
+`````
+sawmill | nc -q 1 -u localhost 8675
 `````
 
 You can also specify custom fields to add:
