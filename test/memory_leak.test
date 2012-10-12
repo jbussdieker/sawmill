@@ -5,6 +5,7 @@
 	done
 ) | ./src/sawmill --host localhost --port -1 - &
 PID=`ps -edf | grep "sawmill " | grep -v grep | awk '{print $2}'`
+START_RSS=`ps -y -l -p $PID | tail -n 1 | awk '{print $8}'`
 
 for i in {1..15}; do
   # Still running?
@@ -14,13 +15,14 @@ for i in {1..15}; do
 
   # Print RSS and sleep
   RSS=`ps -y -l -p $PID | tail -n 1 | awk '{print $8}'`
-  echo "Memory Usage: $RSS bytes"
-
-  if [[ "x$i" == "x30" ]]; then echo "Test timed out :("
-    echo 2
-  fi
+  echo "Memory Usage: $RSS KB"
 
   sleep 1
 done
+
+if [[ "x$START_RSS" != "x$RSS" ]]; then
+  echo "Memory Leak Detected!"
+  exit 1
+fi
 
 exit 0

@@ -91,6 +91,6 @@ void emit(void *arg, int line_len, char *dirp) {
 
   amqp_publish(emitter->conn, emitter->config->exchange, "logstash", message);
 
-  sawmill_free(line);
+  //sawmill_free(line);
   sawmill_free(message);
 }
