@@ -1,7 +1,9 @@
 #!/bin/sh
-git clone https://github.com/alanxz/rabbitmq-c.git vendor/rabbitmq-c
+#git clone https://github.com/alanxz/rabbitmq-c.git vendor/rabbitmq-c
+git submodule init
+git submodule update
 cd vendor/rabbitmq-c
-git checkout 08fbbed79a3963320f9f3b850302afa095c0b348
+#git checkout 08fbbed79a3963320f9f3b850302afa095c0b348
 git submodule init
 git submodule update
 sed -i 's/disable-static/disable-shared/g' configure.ac
