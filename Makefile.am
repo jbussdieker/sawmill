@@ -1,12 +1,8 @@
-bin_PROGRAMS = bin/sawmill
-bin_sawmill_SOURCES = src/sawmill.c src/harvester.c src/emitter.c src/amqp.c src/backoff.c
-bin_sawmill_LDADD = $(rabbitmq_LIBS)
-AM_CPPFLAGS = $(rabbitmq_CFLAGS)
-
 TESTS = test/memory_leak.test
+SUBDIRS = src
 
 clean-local:
-	rm *.deb
+	rm -f *.deb
 
 # Debian packaging
 deb:$(bin_PROGRAMS)
