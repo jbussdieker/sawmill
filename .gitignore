@@ -1,4 +1,4 @@
-.deps/*
+src/.deps/*
 autom4te.cache/*
 configure
 install-sh
@@ -11,5 +11,5 @@ stamp-h1
 *.o
 *.deb
 /config.*
-bin/*
+src/sawmill
 vendor/*
