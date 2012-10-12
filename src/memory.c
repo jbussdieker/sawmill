@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include <stdlib.h>
 
 void hex_dump(void *ptr, int size) {

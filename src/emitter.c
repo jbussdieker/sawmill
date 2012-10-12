@@ -3,7 +3,7 @@
 #include <string.h>
 
 #include "memory.h"
-#include "amqp.h"
+#include "amqp_emitter.h"
 #include "harvester.h"
 
 struct emitter {
