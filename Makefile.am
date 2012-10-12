@@ -1,5 +1,4 @@
-TESTS = test/memory_leak.test
-SUBDIRS = src
+SUBDIRS = src test
 
 clean-local:
 	rm -f *.deb

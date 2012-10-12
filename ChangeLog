@@ -4,6 +4,7 @@ Thu Oct 11 11:17:38 PDT 2012  Joshua Bussdieker <jbussdieker@gmail.com>
 	* Better emitter abstraction
 	* Added stdout emitter
 	* Better memory leak test
+	* Add protocol tests
 	* Version 0.2.12 -> 0.2.13
 
 Thu Oct 4 09:14:29 PDT 2012  Joshua Bussdieker <jbussdieker@gmail.com>

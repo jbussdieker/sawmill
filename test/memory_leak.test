@@ -1,11 +1,14 @@
 #!/bin/bash
+PROGRAM=../src/sawmill
+echo "=== $0"
+
 (
 	for (( ; ; )); do
 	  echo "\"asdfqwer\""
 	done
-) | ./src/sawmill > /dev/null &
+) | $PROGRAM > /dev/null &
 
-PID=`ps -edf | grep "src/sawmill -f findthisproc" | grep -v grep | awk '{print $2}'`
+PID=`ps -edf | grep "$PROGRAM" | grep -v grep | awk '{print $2}'`
 START_RSS=`ps -y -l -p $PID | tail -n 1 | awk '{print $8}'`
 
 for i in {1..5}; do
@@ -19,7 +22,7 @@ for i in {1..5}; do
 
   # Print RSS and sleep
   RSS=`ps -y -l -p $PID | tail -n 1 | awk '{print $8}'`
-  echo "PASS $i: $RSS KB"
+  echo "RSS after $i second(s): $RSS KB"
 
   sleep 1
 done

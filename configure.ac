@@ -2,7 +2,7 @@ AC_PREREQ([2.61])
 AC_INIT(sawmill, 0.2.13)
 AC_CONFIG_HEADERS([config.h])
 AM_INIT_AUTOMAKE
-AC_CONFIG_FILES([Makefile src/Makefile])
+AC_CONFIG_FILES([Makefile src/Makefile test/Makefile])
 AC_PROG_CC
 AC_CHECK_LIB(pthread, pthread_create)
 AC_ARG_WITH([rabbitmq-include-path],

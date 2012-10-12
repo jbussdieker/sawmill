@@ -197,7 +197,9 @@ int main(int argc, char **argv) {
     pthread_join(harvesters[i], NULL);
   }
 
-  printf("All harvesters completed. Exiting.\n");
+  if (debug == 1) {
+    printf("DEBUG: All harvesters completed. Exiting.\n");
+  }
 
   return 1;
 }

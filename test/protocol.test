@@ -1,0 +1,33 @@
+#!/bin/bash
+PROGRAM=../src/sawmill
+echo "=== $0"
+
+check_result() {
+  if [[ "$RESULT" != "$TEST_CASE" ]]; then
+    echo "  EXPECTED: $TEST_CASE"
+    echo "       GOT: $RESULT"
+    exit 1
+  fi
+}
+
+TEST_CASE='{"@fields":{"@message":"test1"}}'
+echo "Checking: echo "test1"       | sawmill"
+RESULT=`echo "test1" | $PROGRAM`
+check_result
+
+TEST_CASE='{"@fields":{"@message":"\"test2\""}}'
+echo "Checking: echo \"\\\"test2\\\"\" | sawmill"
+RESULT=`echo "\"test2\"" | $PROGRAM`
+check_result
+
+TEST_CASE='{"@fields":{"@message":"test3"},"a":"b"}'
+echo "Checking: echo \"test3\"     | sawmill -f a=b"
+RESULT=`echo "test3" | $PROGRAM -f a=b`
+check_result
+
+TEST_CASE='{"@fields":{"@message":"test4"},"a":"b","c":"d"}'
+echo "Checking: echo \"test4\"     | sawmill -f a=b -f c=d"
+RESULT=`echo "test4" | $PROGRAM -f a=b -f c=d`
+check_result
+
+exit 0
