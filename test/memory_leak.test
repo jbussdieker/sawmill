@@ -1,19 +1,15 @@
 #!/bin/bash
 (
-	for i in {1..50000}; do
+	for i in {1..500000}; do
 	  echo "\"asdfqwer\""
 	done
-) | ./bin/sawmill --host localhost --port -1 - &
-
-sleep 1
+) | ./src/sawmill --host localhost --port -1 - &
+PID=`ps -edf | grep "sawmill " | grep -v grep | awk '{print $2}'`
 
 for i in {1..15}; do
-  # Get test proc pid
-  PID=`ps -edf | grep sawmill | grep -v grep | awk '{print $2}'`
-
   # Still running?
   # TODO: This doesn't detect duplicate processes
-  ps -edf | grep sawmill | grep -v grep &> /dev/null
+  ps -edf | grep "$PID " | grep -v grep &> /dev/null
   [[ "$?" != "0" ]] && break
 
   # Print RSS and sleep
