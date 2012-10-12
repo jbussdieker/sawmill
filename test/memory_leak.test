@@ -1,6 +1,6 @@
 #!/bin/bash
 (
-	for i in {1..500000}; do
+	for i in {1..50000}; do
 	  echo "\"asdfqwer\""
 	done
 ) | ./bin/sawmill --host localhost --port -1 - &
@@ -26,6 +26,5 @@ for i in {1..15}; do
 
   sleep 1
 done
-
 
 exit 0
